@@ -1,0 +1,57 @@
+--- src/target/armv7m.c.orig	2013-04-28 09:42:17.000000000 +0200
++++ src/target/armv7m.c	2014-02-28 23:54:38.000000000 +0100
+@@ -255,16 +255,13 @@
+ 
+ /**
+  * Returns generic ARM userspace registers to GDB.
+- * GDB doesn't quite understand that most ARMs don't have floating point
+- * hardware, so this also fakes a set of long-obsolete FPA registers that
+- * are not used in EABI based software stacks.
+  */
+ int armv7m_get_gdb_reg_list(struct target *target, struct reg **reg_list[], int *reg_list_size)
+ {
+ 	struct armv7m_common *armv7m = target_to_armv7m(target);
+ 	int i;
+ 
+-	*reg_list_size = 26;
++	*reg_list_size = 17;
+ 	*reg_list = malloc(sizeof(struct reg *) * (*reg_list_size));
+ 
+ 	/*
+@@ -274,24 +271,9 @@
+ 	 *  - (obsolete) FPA status
+ 	 *  - CPSR
+ 	 */
+-	for (i = 0; i < 16; i++)
++	for (i = 0; i < 17; i++)
+ 		(*reg_list)[i] = &armv7m->arm.core_cache->reg_list[i];
+ 
+-	for (i = 16; i < 24; i++)
+-		(*reg_list)[i] = &arm_gdb_dummy_fp_reg;
+-	(*reg_list)[24] = &arm_gdb_dummy_fps_reg;
+-
+-#ifdef ARMV7_GDB_HACKS
+-	/* use dummy cpsr reg otherwise gdb may try and set the thumb bit */
+-	(*reg_list)[25] = &armv7m_gdb_dummy_cpsr_reg;
+-
+-	/* ARMV7M is always in thumb mode, try to make GDB understand this
+-	 * if it does not support this arch */
+-	*((char *)armv7m->arm.pc->value) |= 1;
+-#else
+-	(*reg_list)[25] = &armv7m->arm.core_cache->reg_list[ARMV7M_xPSR];
+-#endif
+-
+ 	return ERROR_OK;
+ }
+ 
+--- src/target/armv7m.h.orig	2013-04-28 09:42:17.000000000 +0200
++++ src/target/armv7m.h	2014-02-28 23:58:04.000000000 +0100
+@@ -31,7 +31,7 @@
+ #include "arm.h"
+ 
+ /* define for enabling armv7 gdb workarounds */
+-#if 1
++#if 0
+ #define ARMV7_GDB_HACKS
+ #endif
+ 
