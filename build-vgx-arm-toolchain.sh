@@ -1,11 +1,11 @@
 #!/bin/bash
 
 
-GCCVERSION=4.8-2014.02
+GCCVERSION=4.8-2014.03
 GDBVERSION=7.6-2013.05
-BINUTILSVERSION=2.24
-NEWLIBVERSION=2.1.0
-OOCDVERSION=0.7.0
+BINUTILSVERSION=2.26
+NEWLIBVERSION=2.4.0
+OOCDVERSION=0.9.0
 
 
 # Stop if any command fails
@@ -252,7 +252,7 @@ if [ ! -e ${STAMPS}/${GCC}-${NEWLIB}.build ]; then
 	fi
 			
     cd build
-    
+
     if [ "X${GCC_CC}" != "X" ] ; then
 	    export GLOBAL_CC=${CC}
 	    log "Overriding the default compiler with: \"${GCC_CC}\""
@@ -333,7 +333,7 @@ if [ ! -e ${STAMPS}/${OOCD}.build ]; then
     
     unpack ${OOCD}
     
-    if [ ! -e patches/patch-openocd-${OOCDVERSION}-arm7m-registers.diff ]; then
+    if [ -e patches/patch-openocd-${OOCDVERSION}-arm7m-registers.diff ]; then
     	log "Patching openocd to support arm7m registers"
     	cd ${OOCD}
     	patch -p0 -i ../patches/patch-openocd-${OOCDVERSION}-arm7m-registers.diff
@@ -350,7 +350,7 @@ if [ ! -e ${STAMPS}/${OOCD}.build ]; then
 							 --disable-werror \
 							 --prefix=${PREFIX} \
 							 --enable-dummy \
-							 --enable-ft2232_ftd2xx \
+							 --enable-legacy-ft2232_ftd2xx \
 							 --enable-usbprog \
 							 --enable-jlink \
 							 --enable-vsllink \
